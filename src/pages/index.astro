@@ -1,0 +1,32 @@
+---
+import { getCollection } from 'astro:content';
+import Base from '../layouts/Base.astro';
+import { getPosts, formatDate } from '../lib/posts';
+
+const posts = await getPosts();
+const series = await getCollection('series');
+---
+<Base>
+  {series.length > 0 && (
+    <section>
+      <h2>Series</h2>
+      <ul class="list">
+        {series.map((s) => (
+          <li><a href={`/series/${s.id}/`}>{s.data.title}</a> <span class="muted">— {s.data.description}</span></li>
+        ))}
+      </ul>
+    </section>
+  )}
+  {posts.length > 0 ? (
+    <section>
+      <h2>Posts</h2>
+      <ul class="list">
+        {posts.map((p) => (
+          <li><time>{formatDate(p.data.date)}</time><a href={`/posts/${p.id}/`}>{p.data.title}</a></li>
+        ))}
+      </ul>
+    </section>
+  ) : (
+    <p class="muted">Nothing here yet.</p>
+  )}
+</Base>

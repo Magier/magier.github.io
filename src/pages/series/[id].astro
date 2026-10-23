@@ -1,0 +1,25 @@
+---
+import { getCollection, render } from 'astro:content';
+import Base from '../../layouts/Base.astro';
+import { getPosts, formatDate } from '../../lib/posts';
+
+export async function getStaticPaths() {
+  const series = await getCollection('series');
+  return series.map((s) => ({ params: { id: s.id }, props: { s } }));
+}
+
+const { s } = Astro.props;
+const { Content } = await render(s);
+const posts = (await getPosts())
+  .filter((p) => p.data.series?.id === s.id)
+  .sort((a, b) => (a.data.seriesOrder ?? 0) - (b.data.seriesOrder ?? 0));
+---
+<Base title={s.data.title} description={s.data.description}>
+  <h1>{s.data.title}</h1>
+  <Content />
+  <ol>
+    {posts.map((p) => (
+      <li><a href={`/posts/${p.id}/`}>{p.data.title}</a> <span class="muted">{formatDate(p.data.date)}</span></li>
+    ))}
+  </ol>
+</Base>

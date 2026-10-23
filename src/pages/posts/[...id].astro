@@ -1,0 +1,24 @@
+---
+import { getEntry, render } from 'astro:content';
+import Base from '../../layouts/Base.astro';
+import { getPosts, formatDate } from '../../lib/posts';
+
+export async function getStaticPaths() {
+  const posts = await getPosts();
+  return posts.map((post) => ({ params: { id: post.id }, props: { post } }));
+}
+
+const { post } = Astro.props;
+const { Content } = await render(post);
+const series = post.data.series ? await getEntry(post.data.series) : undefined;
+---
+<Base title={post.data.title} description={post.data.description}>
+  <article>
+    <h1>{post.data.title}</h1>
+    <p class="muted">
+      <time>{formatDate(post.data.date)}</time>
+      {series && <> · part of <a href={`/series/${series.id}/`}>{series.data.title}</a></>}
+    </p>
+    <Content />
+  </article>
+</Base>

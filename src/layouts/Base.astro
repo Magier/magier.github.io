@@ -1,0 +1,58 @@
+---
+interface Props {
+  title?: string;
+  description?: string;
+}
+const { title, description = 'Notes and series by Markus Gierlinger.' } = Astro.props;
+const fullTitle = title ? `${title} · magier` : 'magier';
+---
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="description" content={description} />
+    <link rel="sitemap" href="/sitemap-index.xml" />
+    <title>{fullTitle}</title>
+  </head>
+  <body>
+    <header><a href="/">magier</a></header>
+    <main><slot /></main>
+  </body>
+</html>
+
+<style is:global>
+  :root {
+    color-scheme: light dark;
+    --fg: #1a1a1a;
+    --muted: #6b6b6b;
+    --bg: #fdfdfc;
+    --link: #1a1a1a;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --fg: #e6e6e3;
+      --muted: #9a9a96;
+      --bg: #141414;
+      --link: #e6e6e3;
+    }
+  }
+  body {
+    max-width: 40rem;
+    margin: 0 auto;
+    padding: 2rem 1rem;
+    font: 1.0625rem/1.65 system-ui, sans-serif;
+    color: var(--fg);
+    background: var(--bg);
+  }
+  a { color: var(--link); text-underline-offset: 0.2em; }
+  header { margin-bottom: 3rem; font-weight: 600; }
+  header a { text-decoration: none; }
+  h1 { line-height: 1.2; }
+  .muted { color: var(--muted); }
+  ul.list { list-style: none; padding: 0; }
+  ul.list li { margin: 0.4rem 0; }
+  ul.list time { color: var(--muted); font-variant-numeric: tabular-nums; margin-right: 1rem; }
+  pre { padding: 1rem; overflow-x: auto; border-radius: 4px; }
+  img { max-width: 100%; }
+</style>
