@@ -2,3 +2,6 @@ node_modules/
 dist/
 .astro/
 .DS_Store
+
+# Unpublished local work; never commit or deploy.
+.local-drafts/

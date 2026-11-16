@@ -19,3 +19,14 @@ pnpm build
   seriesOrder: 1          # optional, order within series
   ```
 - Series: `src/content/series/<slug>.md` with `title`, `description`, and an intro as body.
+
+## Visitor analytics (GoatCounter)
+
+The deployment workflow sets `PUBLIC_GOATCOUNTER_CODE=magier`.
+Dashboard: https://magier.goatcounter.com/ (account access required).
+This site code is public configuration, not a secret.
+
+Tracking is always off in `pnpm dev`. Local builds leave tracking off unless the variable is supplied:
+`PUBLIC_GOATCOUNTER_CODE=magier pnpm build`.
+
+The privacy page reflects whether analytics are enabled. Remove the variable from the workflow and redeploy to disable tracking.

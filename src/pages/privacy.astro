@@ -1,0 +1,17 @@
+---
+import Base from '../layouts/Base.astro';
+const analyticsEnabled = import.meta.env.PROD && !!import.meta.env.PUBLIC_GOATCOUNTER_CODE?.trim();
+---
+<Base title="Privacy" description="Privacy and visitor analytics on Magier’s Musings.">
+  <article>
+    <h1>Privacy</h1>
+    {analyticsEnabled ? <>
+      <p>This site uses <a href="https://www.goatcounter.com/">GoatCounter</a> to understand which pages people read and how they find them.</p>
+      <p>The analytics script sends page views and information such as the referring website, browser, device type, and screen size to GoatCounter. GoatCounter derives an approximate location from your IP address. It does not use tracking cookies or track you across different websites.</p>
+      <p>See <a href="https://www.goatcounter.com/help/privacy">GoatCounter’s privacy information</a> for details about its processing and retention.</p>
+    </> : <p>Visitor analytics are not enabled on this version of the site.</p>}
+    <p>The appearance controls save your chosen palette and light/dark mode in your browser’s local storage. These preferences are not sent to an analytics service.</p>
+    <p>This site is hosted on GitHub Pages. GitHub may process technical request information to operate the hosting service; see <a href="https://docs.github.com/en/site-policy/privacy-policies/github-general-privacy-statement">GitHub’s privacy statement</a>.</p>
+    <p><a href="/">Back to the notebook</a></p>
+  </article>
+</Base>

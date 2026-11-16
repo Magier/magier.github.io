@@ -2,31 +2,34 @@
 import { getCollection } from 'astro:content';
 import Base from '../layouts/Base.astro';
 import { getPosts, formatDate } from '../lib/posts';
-
 const posts = await getPosts();
 const series = await getCollection('series');
 ---
 <Base>
-  {series.length > 0 && (
-    <section>
-      <h2>Series</h2>
-      <ul class="list">
-        {series.map((s) => (
-          <li><a href={`/series/${s.id}/`}>{s.data.title}</a> <span class="muted">— {s.data.description}</span></li>
-        ))}
-      </ul>
-    </section>
-  )}
-  {posts.length > 0 ? (
-    <section>
-      <h2>Posts</h2>
-      <ul class="list">
-        {posts.map((p) => (
-          <li><time>{formatDate(p.data.date)}</time><a href={`/posts/${p.id}/`}>{p.data.title}</a></li>
-        ))}
-      </ul>
-    </section>
-  ) : (
-    <p class="muted">Nothing here yet.</p>
-  )}
+  <section class="intro" aria-label="About this notebook">
+    <p>I research agentic AI security. Before that: Kubernetes security, symbolic AI, and software engineering. These are my notes on where those worlds meet.</p>
+  </section>
+
+  <section class="writing" aria-labelledby="writing-title">
+    <h2 id="writing-title" class="section-label">Writing</h2>
+    {posts.length === 0 && <p class="empty">First notes coming soon.</p>}
+    {posts.length > 0 && <div class="published"><h2 class="section-label">Published notes</h2><ul class="list">{posts.map(p => <li><time>{formatDate(p.data.date)}</time><a href={`/posts/${p.id}/`}>{p.data.title}</a></li>)}</ul></div>}
+    {series.length > 0 && <div class="published"><h2 class="section-label">Series</h2><ul class="list">{series.map(s => <li><a href={`/series/${s.id}/`}>{s.data.title}</a> — {s.data.description}</li>)}</ul></div>}
+  </section>
+
+  <aside class="bench" aria-labelledby="bench-title">
+    <h2 id="bench-title" class="section-label">Project</h2>
+    <div class="bench-content"><h3><a href="https://github.com/Magier/Ran">Ran</a></h3><p>My open-source project for adversary emulation in Kubernetes. A different way into the same questions: what can an attacker do, and what actually stops them?</p></div>
+  </aside>
 </Base>
+<style>
+  .intro { padding:28px 0 40px; color:var(--muted); }
+  .intro p { margin:0; }
+  .section-label { margin:0 0 24px; }
+  .empty { color:var(--muted); padding-bottom:32px; }
+  .bench { border-top:1px solid var(--line); padding-top:26px; }
+  .bench-content h3 { margin:0 0 12px; }
+  .bench-content h3 a { color:var(--accent); }
+  .bench-content p { margin:0; }
+  .published { border-top:1px solid var(--line); padding:25px 0; }
+</style>

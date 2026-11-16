@@ -1,0 +1,121 @@
+---
+---
+
+<div class="appearance" aria-label="Appearance settings">
+  <span class="study-label">Appearance</span>
+  <label class="palette-control">
+    <span class="sr-only">Color palette</span>
+    <select name="palette" data-palette-select>
+      <option value="moss">Moss & stone</option>
+      <option value="ember">Ember & ink</option>
+      <option value="indigo">Indigo & paper</option>
+      <option value="ochre">Ochre & soot</option>
+    </select>
+  </label>
+  <button type="button" data-mode-toggle aria-label="Light mode" aria-pressed="false">
+    <span data-mode-label>Dark mode</span>
+  </button>
+</div>
+
+<script>
+  const root = document.documentElement;
+  const paletteSelect = document.querySelector<HTMLSelectElement>('[data-palette-select]');
+  const modeToggle = document.querySelector<HTMLButtonElement>('[data-mode-toggle]');
+  const modeLabel = document.querySelector<HTMLElement>('[data-mode-label]');
+  const palettes = ['moss', 'ember', 'indigo', 'ochre'];
+  let palette = 'ember';
+  let mode = 'dark';
+
+  try {
+    const savedPalette = localStorage.getItem('palette');
+    const savedMode = localStorage.getItem('mode');
+    if (savedPalette && palettes.includes(savedPalette)) palette = savedPalette;
+    if (savedMode === 'light' || savedMode === 'dark') mode = savedMode;
+  } catch {
+    // Appearance controls still work when browser storage is unavailable.
+  }
+
+  function render() {
+    root.dataset.palette = palette;
+    root.dataset.mode = mode;
+    if (paletteSelect) paletteSelect.value = palette;
+    modeToggle?.setAttribute('aria-pressed', String(mode === 'light'));
+    if (modeLabel) modeLabel.textContent = mode === 'light' ? 'Light mode' : 'Dark mode';
+  }
+
+  function persist() {
+    try {
+      localStorage.setItem('palette', palette);
+      localStorage.setItem('mode', mode);
+    } catch {
+      // Keep the current selection for this page even without storage.
+    }
+  }
+
+  paletteSelect?.addEventListener('change', () => {
+    if (!paletteSelect || !palettes.includes(paletteSelect.value)) return;
+    palette = paletteSelect.value;
+    render();
+    persist();
+  });
+
+  modeToggle?.addEventListener('click', () => {
+    mode = mode === 'dark' ? 'light' : 'dark';
+    render();
+    persist();
+  });
+
+  render();
+</script>
+
+<style>
+  .appearance {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.55rem;
+    color: var(--muted);
+    font: 16px/1.5 var(--font-text);
+  }
+
+  .study-label {
+    margin-right: 0.2rem;
+    font-size: inherit;
+  }
+
+  select,
+  button {
+    min-height: 2.25rem;
+    border: 1px solid var(--line);
+    border-radius: 0;
+    padding: 0.4rem 0.65rem;
+    background: var(--bg);
+    color: var(--fg);
+    font: inherit;
+    cursor: pointer;
+  }
+
+  select:hover,
+  button:hover {
+    border-color: var(--accent);
+  }
+
+  select:focus-visible,
+  button:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 3px;
+  }
+
+  button[aria-pressed='true'] {
+    color: var(--accent);
+  }
+
+  .sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+</style>

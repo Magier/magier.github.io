@@ -20,6 +20,8 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: withastro/action@v5
+        env:
+          PUBLIC_GOATCOUNTER_CODE: magier
         with:
           node-version: 24
   deploy:

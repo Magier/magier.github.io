@@ -1,58 +1,93 @@
 ---
-interface Props {
-  title?: string;
-  description?: string;
-}
-const { title, description = 'Notes and series by Markus Gierlinger.' } = Astro.props;
-const fullTitle = title ? `${title} · magier` : 'magier';
+import Appearance from '../components/Appearance.astro';
+interface Props { title?: string; description?: string; wide?: boolean; }
+const { title, wide = false, description = 'Independent notes on agentic AI security, Kubernetes, and the systems underneath. By Markus, also known as Magier.' } = Astro.props;
+const goatCounterCode = import.meta.env.PUBLIC_GOATCOUNTER_CODE?.trim();
+const analyticsEnabled = import.meta.env.PROD && !!goatCounterCode;
+const fullTitle = title ? `${title} · Magier’s Musings` : 'Magier’s Musings';
 ---
 <!doctype html>
-<html lang="en">
+<html lang="en" data-palette="ember" data-mode="dark">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="description" content={description} />
+    <link rel="preload" href="/fonts/instrument-sans.ttf" as="font" type="font/ttf" crossorigin />
     <link rel="sitemap" href="/sitemap-index.xml" />
     <title>{fullTitle}</title>
+    {analyticsEnabled && (
+      <script is:inline defer data-goatcounter={`https://${goatCounterCode}.goatcounter.com/count`} src="https://gc.zgo.at/count.js"></script>
+    )}
+    <script is:inline>
+      try {
+        const p = localStorage.getItem('palette');
+        const m = localStorage.getItem('mode');
+        if (['moss', 'ember', 'indigo', 'ochre'].includes(p)) document.documentElement.dataset.palette = p;
+        if (['light', 'dark'].includes(m)) document.documentElement.dataset.mode = m;
+      } catch {}
+    </script>
   </head>
   <body>
-    <header><a href="/">magier</a></header>
-    <main><slot /></main>
+    <a class="skip" href="#content">Skip to content</a>
+    <div class:list={["page", { "page-wide": wide }]}>
+      <header class="masthead">
+        <a href="/" class="wordmark">Magier’s Musings</a>
+        <span class="byline">By Markus / <a href="https://github.com/Magier">Magier</a></span>
+      </header>
+      <main id="content"><slot /></main>
+      <footer>
+        <p>Markus · <a href="https://github.com/Magier">GitHub ↗</a><br /><span class="muted">Personal notes. Views are my own. · <a href="/privacy/">Privacy</a></span></p>
+        <Appearance />
+      </footer>
+    </div>
   </body>
 </html>
 
 <style is:global>
+  @font-face {
+    font-family:'Instrument Sans';
+    font-style:normal;
+    font-weight:400 700;
+    font-display:swap;
+    src:url('/fonts/instrument-sans.ttf') format('truetype');
+  }
   :root {
-    color-scheme: light dark;
-    --fg: #1a1a1a;
-    --muted: #6b6b6b;
-    --bg: #fdfdfc;
-    --link: #1a1a1a;
+    color-scheme: dark;
+    --bg: #171c19; --surface: #242c26; --fg: #e3e4da;
+    --accent: #9eaf88; --secondary: #c2aa7d; --muted: #a5aba1; --line: #3c463e;
+    --font-text: 'Instrument Sans', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    --mono: 'SFMono-Regular', Consolas, 'Liberation Mono', monospace;
   }
-  @media (prefers-color-scheme: dark) {
-    :root {
-      --fg: #e6e6e3;
-      --muted: #9a9a96;
-      --bg: #141414;
-      --link: #e6e6e3;
-    }
-  }
-  body {
-    max-width: 40rem;
-    margin: 0 auto;
-    padding: 2rem 1rem;
-    font: 1.0625rem/1.65 system-ui, sans-serif;
-    color: var(--fg);
-    background: var(--bg);
-  }
-  a { color: var(--link); text-underline-offset: 0.2em; }
-  header { margin-bottom: 3rem; font-weight: 600; }
-  header a { text-decoration: none; }
-  h1 { line-height: 1.2; }
-  .muted { color: var(--muted); }
-  ul.list { list-style: none; padding: 0; }
-  ul.list li { margin: 0.4rem 0; }
-  ul.list time { color: var(--muted); font-variant-numeric: tabular-nums; margin-right: 1rem; }
-  pre { padding: 1rem; overflow-x: auto; border-radius: 4px; }
-  img { max-width: 100%; }
+  :root[data-palette="ember"] { --bg:#181a1b; --surface:#242728; --fg:#e7e2d8; --accent:#c97059; --secondary:#a59a83; --muted:#aaa59c; --line:#424240; }
+  :root[data-palette="indigo"] { --bg:#171922; --surface:#252936; --fg:#e5e2da; --accent:#9babe0; --secondary:#c18e79; --muted:#aaaab7; --line:#3d4253; }
+  :root[data-palette="ochre"] { --bg:#191918; --surface:#282824; --fg:#e8e3d5; --accent:#c6a15b; --secondary:#8da59a; --muted:#aaa79c; --line:#434139; }
+  :root[data-mode="light"] { color-scheme:light; --bg:#f2f1e9; --surface:#e7e8df; --fg:#242c26; --accent:#50663c; --secondary:#795e30; --muted:#62695e; --line:#c9cec1; }
+  :root[data-mode="light"][data-palette="ember"] { --bg:#f5f0e7; --surface:#ebe3d8; --fg:#302a27; --accent:#a24632; --secondary:#74664d; --muted:#75685d; --line:#d5c9ba; }
+  :root[data-mode="light"][data-palette="indigo"] { --bg:#f0f0f3; --surface:#e3e5ed; --fg:#252936; --accent:#4b5fa0; --secondary:#995f48; --muted:#646877; --line:#c8ccda; }
+  :root[data-mode="light"][data-palette="ochre"] { --bg:#f5f0e3; --surface:#eae3d2; --fg:#302d24; --accent:#85631e; --secondary:#486a5d; --muted:#726a58; --line:#d4cab4; }
+  * { box-sizing:border-box; }
+  body { margin:0; background:var(--bg); color:var(--fg); font: 18px/1.7 var(--font-text); }
+  .page { width:min(100% - 3rem, 720px); margin:0 auto; }
+  .page-wide { width:min(100% - 3rem, 960px); }
+  .page-wide main > article { max-width:none; }
+  a { color:inherit; text-underline-offset:.23em; text-decoration-thickness:1px; }
+  a:hover { color:var(--accent); }
+  :focus-visible { outline:2px solid var(--accent); outline-offset:5px; }
+  .skip { position:absolute; left:1rem; top:-5rem; background:var(--bg); padding:.5rem; z-index:10; }
+  .skip:focus { top:1rem; }
+  .masthead { padding:56px 0 28px; border-bottom:1px solid var(--line); }
+  .wordmark { font-size:clamp(32px, 6vw, 44px); line-height:1.2; font-weight:600; text-decoration:none; }
+  .byline { display:block; color:var(--muted); margin-top:6px; }
+  h1,h2,h3 { font-size:20px; font-weight:600; line-height:1.5; letter-spacing:normal; }
+  .section-label { font:inherit; color:var(--muted); }
+  p { margin:0 0 1.2rem; }
+  .muted { color:var(--muted); }
+  footer { margin-top:80px; padding:25px 0 38px; border-top:1px solid var(--line); display:flex; flex-direction:column; gap:24px; align-items:flex-start; }
+  footer p { font-size:16px; line-height:1.7; }
+  main > article { max-width:680px; margin:50px auto; }
+  pre { padding:1rem; background:var(--surface); overflow-x:auto; }
+  img,svg { max-width:100%; }
+  ul.list { padding:0; list-style:none; }
+  ul.list time { color:var(--muted); margin-right:1rem; }
+  @media(max-width:600px) { .masthead { padding-top:36px; } footer { flex-direction:column; margin-top:52px; } }
 </style>
