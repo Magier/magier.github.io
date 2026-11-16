@@ -34,11 +34,13 @@ Similarly, a page under `src/pages/` can create a public route without appearing
 
 The sandbox article is currently parked in `.local-drafts/sandbox/`, including its original HTML, adapted page, styles, and interactive script. It must stay unpublished until explicitly approved after the employer's article has gone live; do not publish it automatically on a date.
 
+Before publishing the sandbox article, migrate it into the existing MDX content collection. Use frontmatter for its title, date, description, and draft status, and components for its interactive diagrams. Do not restore its temporary standalone Astro route: it must use the normal post listing, metadata, and draft filtering.
+
 Ignored drafts are **not backed up by Git**. Keep a separate private backup if they matter.
 
 ### File organization
 
-- `src/content/posts/`: Markdown and MDX posts.
+- `src/content/posts/`: Markdown and MDX posts. All posts use the wide layout (960px maximum), aligning prose and diagrams.
 - `src/content/series/`: series introductions and metadata.
 - `src/components/`: reusable interactive components.
 - `src/layouts/Base.astro`: shared page structure, design tokens, typography, and analytics.
