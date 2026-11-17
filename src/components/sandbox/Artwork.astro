@@ -1,0 +1,11 @@
+<div class="sandbox-artwork">
+  <img class="dark-art" src="/images/hands-in-the-sandbox/robot-garden-dark.png" width="1200" height="600" alt="An ink-wash robot in a garden, enclosed by a fence and a gate with one controlled opening." fetchpriority="high" />
+  <img class="light-art" src="/images/hands-in-the-sandbox/robot-garden-light.png" width="1200" height="600" alt="An ink-wash robot in a garden, enclosed by a fence and a gate with one controlled opening." />
+</div>
+<style>
+  .sandbox-artwork { margin:24px 0 32px; }
+  img { display:block; width:100%; height:auto; border-radius:10px; }
+  .light-art { display:none; }
+  :global(html[data-mode="light"]) .dark-art { display:none; }
+  :global(html[data-mode="light"]) .light-art { display:block; }
+</style>

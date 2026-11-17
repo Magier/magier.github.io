@@ -9,7 +9,8 @@
       <option value="moss">Moss & stone</option>
       <option value="ember">Ember & ink</option>
       <option value="indigo">Indigo & paper</option>
-      <option value="ochre">Ochre & soot</option>
+      <option value="persimmon">Persimmon red</option>
+      <option value="purple">Ran purple</option>
     </select>
   </label>
   <button type="button" data-mode-toggle aria-label="Light mode" aria-pressed="false">
@@ -22,8 +23,8 @@
   const paletteSelect = document.querySelector<HTMLSelectElement>('[data-palette-select]');
   const modeToggle = document.querySelector<HTMLButtonElement>('[data-mode-toggle]');
   const modeLabel = document.querySelector<HTMLElement>('[data-mode-label]');
-  const palettes = ['moss', 'ember', 'indigo', 'ochre'];
-  let palette = 'ember';
+  const palettes = ['moss', 'ember', 'indigo', 'persimmon', 'purple'];
+  let palette = 'indigo';
   let mode = 'dark';
 
   try {

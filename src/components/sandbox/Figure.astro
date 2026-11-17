@@ -1,0 +1,12 @@
+---
+import network from './fig-net.html?raw';
+import credentials from './fig-keys.html?raw';
+import layers from './fig-nest.html?raw';
+import './sandbox.css';
+interface Props { kind: 'network' | 'credentials' | 'layers' }
+const figures = { network, credentials, layers };
+---
+<div class="sandbox-post" set:html={figures[Astro.props.kind]} />
+<script>
+  import './diagrams.js';
+</script>

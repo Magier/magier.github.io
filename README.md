@@ -32,9 +32,9 @@ Keep private or embargoed material in `.local-drafts/` (ignored by Git) or outsi
 Never put unpublished HTML, scripts, or assets in `public/`: everything in that folder is copied directly into the deployed website, even if no page links to it.
 Similarly, a page under `src/pages/` can create a public route without appearing on the homepage.
 
-The sandbox article is currently parked in `.local-drafts/sandbox/`, including its original HTML, adapted page, styles, and interactive script. It must stay unpublished until explicitly approved after the employer's article has gone live; do not publish it automatically on a date.
+The original full sandbox article remains in `.local-drafts/sandbox/`. Its incident analysis and employer-specific material must stay unpublished until explicitly approved after the employer's article has gone live; do not publish it automatically on a date.
 
-Before publishing the sandbox article, migrate it into the existing MDX content collection. Use frontmatter for its title, date, description, and draft status, and components for its interactive diagrams. Do not restore its temporary standalone Astro route: it must use the normal post listing, metadata, and draft filtering.
+The published basics-only post is in `src/content/posts/hands-in-the-sandbox.mdx`. It covers filesystem, network, credentials, execution isolation, and scope, using shared figure components. It uses the normal metadata, listing, and draft filtering. Unlike the private original, this basics-only version is cleared by the author for publication once reviewed.
 
 Ignored drafts are **not backed up by Git**. Keep a separate private backup if they matter.
 
@@ -72,3 +72,10 @@ Tracking is always off in `pnpm dev`. Local builds leave tracking off unless the
 `PUBLIC_GOATCOUNTER_CODE=magier pnpm build`.
 
 The privacy page reflects whether analytics are enabled. Remove the variable from the workflow and redeploy to disable tracking.
+
+## Illustration skill
+
+The project-local skill at `.agents/skills/blog-illustration/SKILL.md` describes the artwork workflow.
+Its `prompt-template.md` preserves the approved sumi-e/woodblock visual identity and exact light/dark palettes.
+Ask an assistant to use that skill when preparing new article illustrations. If its client does not discover project skills automatically, give it that path explicitly.
+These files are repository documentation, not website pages. They will be public on GitHub if committed.

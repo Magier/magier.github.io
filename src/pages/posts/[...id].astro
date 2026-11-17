@@ -15,6 +15,7 @@ const series = post.data.series ? await getEntry(post.data.series) : undefined;
 <Base wide title={post.data.title} description={post.data.description}>
   <article>
     <h1>{post.data.title}</h1>
+    {post.data.description && <p class="post-subtitle muted">{post.data.description}</p>}
     <p class="muted">
       <time>{formatDate(post.data.date)}</time>
       {series && <> · part of <a href={`/series/${series.id}/`}>{series.data.title}</a></>}

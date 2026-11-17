@@ -7,7 +7,7 @@ const analyticsEnabled = import.meta.env.PROD && !!goatCounterCode;
 const fullTitle = title ? `${title} · Magier’s Musings` : 'Magier’s Musings';
 ---
 <!doctype html>
-<html lang="en" data-palette="ember" data-mode="dark">
+<html lang="en" data-palette="indigo" data-mode="dark">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -22,7 +22,8 @@ const fullTitle = title ? `${title} · Magier’s Musings` : 'Magier’s Musings
       try {
         const p = localStorage.getItem('palette');
         const m = localStorage.getItem('mode');
-        if (['moss', 'ember', 'indigo', 'ochre'].includes(p)) document.documentElement.dataset.palette = p;
+        if (['moss', 'ember', 'indigo', 'persimmon', 'purple'].includes(p)) document.documentElement.dataset.palette = p;
+        if (['ochre', 'gold'].includes(p)) localStorage.setItem('palette', 'indigo');
         if (['light', 'dark'].includes(m)) document.documentElement.dataset.mode = m;
       } catch {}
     </script>
@@ -59,12 +60,14 @@ const fullTitle = title ? `${title} · Magier’s Musings` : 'Magier’s Musings
     --mono: 'SFMono-Regular', Consolas, 'Liberation Mono', monospace;
   }
   :root[data-palette="ember"] { --bg:#181a1b; --surface:#242728; --fg:#e7e2d8; --accent:#c97059; --secondary:#a59a83; --muted:#aaa59c; --line:#424240; }
-  :root[data-palette="indigo"] { --bg:#171922; --surface:#252936; --fg:#e5e2da; --accent:#9babe0; --secondary:#c18e79; --muted:#aaaab7; --line:#3d4253; }
-  :root[data-palette="ochre"] { --bg:#191918; --surface:#282824; --fg:#e8e3d5; --accent:#c6a15b; --secondary:#8da59a; --muted:#aaa79c; --line:#434139; }
+  :root[data-palette="indigo"] { --bg:#171922; --surface:#252936; --fg:#e5e2da; --accent:#899de2; --secondary:#c18e79; --muted:#aaaab7; --line:#3d4253; }
   :root[data-mode="light"] { color-scheme:light; --bg:#f2f1e9; --surface:#e7e8df; --fg:#242c26; --accent:#50663c; --secondary:#795e30; --muted:#62695e; --line:#c9cec1; }
   :root[data-mode="light"][data-palette="ember"] { --bg:#f5f0e7; --surface:#ebe3d8; --fg:#302a27; --accent:#a24632; --secondary:#74664d; --muted:#75685d; --line:#d5c9ba; }
-  :root[data-mode="light"][data-palette="indigo"] { --bg:#f0f0f3; --surface:#e3e5ed; --fg:#252936; --accent:#4b5fa0; --secondary:#995f48; --muted:#646877; --line:#c8ccda; }
-  :root[data-mode="light"][data-palette="ochre"] { --bg:#f5f0e3; --surface:#eae3d2; --fg:#302d24; --accent:#85631e; --secondary:#486a5d; --muted:#726a58; --line:#d4cab4; }
+  :root[data-mode="light"][data-palette="indigo"] { --bg:#f7f4ed; --surface:#ede9e1; --fg:#30313b; --accent:#4b5fa0; --secondary:#a9a49e; --muted:#69665f; --line:#d5d0c6; }
+  :root[data-palette="persimmon"] { --bg:#191a1b; --surface:#252729; --fg:#e8e5de; --accent:#f05b42; --secondary:#afa69b; --muted:#abaea9; --line:#424541; }
+  :root[data-palette="purple"] { --bg:#19181e; --surface:#27242f; --fg:#e9e5ed; --accent:#b18aff; --secondary:#a6afa9; --muted:#ada7b6; --line:#443e50; }
+  :root[data-mode="light"][data-palette="persimmon"] { --bg:#f4f2eb; --surface:#eae6da; --fg:#292b2c; --accent:#b73724; --secondary:#756354; --muted:#676b65; --line:#cccbbf; }
+  :root[data-mode="light"][data-palette="purple"] { --bg:#f3f0f6; --surface:#e8e1ef; --fg:#2b2632; --accent:#600fed; --secondary:#526b5b; --muted:#6b6275; --line:#cfc5d9; }
   * { box-sizing:border-box; }
   body { margin:0; background:var(--bg); color:var(--fg); font: 18px/1.7 var(--font-text); }
   .page { width:min(100% - 3rem, 720px); margin:0 auto; }

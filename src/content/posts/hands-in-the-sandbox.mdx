@@ -1,0 +1,122 @@
+---
+title: "50 Shades of Isolation"
+description: "What ‘sandboxed’ actually means for AI agents"
+date: 2026-11-16
+draft: false
+---
+
+import Figure from '../../components/sandbox/Figure.astro';
+import Artwork from '../../components/sandbox/Artwork.astro';
+
+<Artwork />
+
+Sandboxing comes up a lot in discussions about securing AI agents, but I'm often left wondering what exactly is being isolated. One setup runs commands in a microVM; another applies an operating-system policy to a process. Sometimes the restriction is just on outgoing network traffic. All of these get called sandboxes, even though they place very different limits on what an agent can do.
+
+To make sense of those differences, I find it useful to look at 4 aspects:
+- filesystem access
+- network access
+- credentials
+- and execution isolation 
+
+I also want to know where the boundary is drawn: does it cover the whole agent, a few tools, or only the code it generates? 
+
+## Why an agent needs a sandbox
+
+An agent combines a language model with a loop and tools that let it act. Depending on the setup, it can read files, run commands, install packages, and make web requests. Those tools are useful, but they also give a lot of authority to a system that reads untrusted content and sometimes makes bad decisions.
+
+When a task gets stuck, an agent can keep trying, moving from a failed tool call to another command, a different file, or another network destination. Even without malicious intent, it can end up accessing something you never meant to give it.
+
+Human approval helps, but reading every permission prompt gets old quickly. A sandbox puts some decisions into boundaries enforced outside the model: these files are writable; those destinations are reachable; this process cannot access that resource. Approval can then focus on exceptions, rather than every routine action. This follows the [least-privilege principle described by Saltzer and Schroeder](https://www.cs.virginia.edu/~evans/cs551/saltzer/): give a program only the privileges it needs for its task.
+
+A sandbox does not make the model trustworthy. It limits what a bad decision can do.
+
+## Four kinds of isolation
+
+The first three boundaries describe **what the agent can reach**, while the fourth describes **how its code is separated from the machine around it**.
+
+An agent with its own kernel can still use a powerful cloud key to affect systems outside the sandbox, especially if it has unrestricted internet access.
+
+### 1. Filesystem
+
+An agent needs files to do useful work: code, documents, data, configuration. An agent running with your user account may also be able to read other projects, SSH keys, browser profiles, shell startup files, and credentials saved by command-line tools.
+
+A starting policy might allow reads and writes in one project directory, read and execute access to required tools, and no access to unrelated files. Even that project directory may contain `.env` files, deployment credentials, or configuration that changes how the agent's tools behave.
+
+Reading a secret exposes it to the agent, while writing a startup script, tool configuration, or [Git hook](https://git-scm.com/docs/githooks) can affect a process that runs later, possibly outside the sandbox. Git executes enabled hooks at specific points in its workflow, so the risk depends on whether a later Git invocation uses the modified hook. When setting file permissions, I would check what the agent can read and which processes will later act on what it writes.
+
+### 2. Network
+
+Network access is a path for data to leave and for actions to affect other systems. It is not just an on/off switch.
+
+<Figure kind="network" />
+
+No network is a useful default for tasks that do not need it. Package-only access can support builds, while an allowlist can permit the services a task actually needs. A denylist leaves everything else open, including destinations you did not think to block.
+
+An allowed service may still accept uploads, public posts, or requests to attacker-controlled accounts, so an allowlist alone will not prevent data leaks. For example, permission to reach GitHub could let an agent upload private files to someone else's repository when all it needed was to fetch a dependency, if it also has the necessary repository permissions. GitHub's [file-contents API](https://docs.github.com/en/rest/repos/contents#create-or-update-file-contents) supports writes as well as reads; a hostname allowlist does not distinguish them. DNS, redirects, direct IP connections, and other routes also need enforcement consistent with the policy. OWASP's [SSRF prevention guidance](https://cheatsheetseries.owasp.org/cheatsheets/Server_Side_Request_Forgery_Prevention_Cheat_Sheet.html) describes how redirects and DNS resolution can undermine destination checks. Its focus is server-side requests, but those bypasses also matter when a sandbox relies on a filtering proxy.
+
+An internal package registry can help control dependencies, but it still needs maintenance and its own access policy.
+
+### 3. Credentials
+
+I treat credentials as a separate boundary because an agent that can read a valid token may not need to escape anything. It can use the authority that token already carries.
+
+There are three common patterns:
+
+- **Static keys in the sandbox.** A file or environment variable contains a key the agent can read. If it leaks, its permissions and lifetime determine the damage.
+- **Short-lived, scoped credentials.** A broker issues a token for the task. The token still enters the sandbox and can leak, but a shorter lifetime and narrower permissions limit how long and for what it can be used. For a concrete example, [AWS STS credentials expire](https://docs.aws.amazon.com/IAM/latest/UserGuide/id_credentials_temp.html), and an [AssumeRole session policy](https://docs.aws.amazon.com/STS/latest/APIReference/API_AssumeRole.html) can further restrict the role's permissions.
+- **Credential injection outside the sandbox.** The agent sends requests through a proxy, which authorizes the destination and action before adding the real credential. The key stays outside the sandbox. [Envoy's credential injector](https://www.envoyproxy.io/docs/envoy/latest/configuration/http/http_filters/credential_injector_filter) is one implementation of the injection step; it explicitly does not handle end-user authentication, so injection alone is not an authorization policy.
+
+<Figure kind="credentials" />
+
+These patterns can be combined: an injecting proxy can obtain short-lived credentials from a broker.
+
+Provided the agent cannot access the proxy's secret store and the proxy does not expose the key in responses or logs, keeping the key outside the sandbox prevents the agent from directly reading it. The agent can still abuse requests the proxy allows. If the proxy adds credentials to anything the agent asks for, the agent retains the same authority even though it never sees the key. The proxy therefore needs a policy covering the destination, account, action, and relevant request contents.
+
+### 4. Execution isolation
+
+Execution isolation describes what separates running code from its host. The following are useful categories, not a universal security ranking.
+
+- **Restricted runtime.** A restricted interpreter, [WebAssembly runtime](https://webassembly.org/docs/security/), or [V8 isolate](https://v8.dev/docs/untrusted-code-mitigations) can expose a small set of capabilities to generated code. Its safety depends on the runtime, the APIs exposed to it, and the surrounding process. V8 recommends running untrusted code in a separate process from sensitive data to limit speculative-execution side channels. It is not necessarily an environment for arbitrary shell commands.
+- **OS process sandbox.** Mechanisms such as [Seatbelt on macOS](https://code.claude.com/docs/en/sandboxing#os-level-enforcement), or [Linux namespaces](https://man7.org/linux/man-pages/man7/namespaces.7.html), [seccomp](https://docs.kernel.org/userspace-api/seccomp_filter.html), and [Landlock](https://docs.kernel.org/userspace-api/landlock.html), restrict an ordinary process. Tools such as [bubblewrap](https://github.com/containers/bubblewrap#sandbox-security) combine some of these mechanisms. Its maintainers emphasize that the protection depends on the arguments used to construct the sandbox; seccomp alone is not a complete sandbox either. They can preserve access to familiar tools, but share the host kernel; overhead depends on the policy and workload.
+- **Container.** A container gives a process its own view of resources such as files, processes, and networking, though ordinary Linux containers still [share the kernel of their Linux host](https://docs.docker.com/engine/security/). That host may itself be a VM, as with Docker Desktop. How much isolation it provides depends on its image, capabilities, mounts, privileges, and runtime configuration. A [privileged container](https://docs.docker.com/engine/containers/run/#runtime-privilege-and-linux-capabilities) can expose host resources that a tightly restricted one would keep out of reach.
+- **VM or microVM.** A guest has its own kernel, with a hypervisor or virtual machine monitor between it and the host. [Firecracker](https://github.com/firecracker-microvm/firecracker/blob/main/docs/design.md), for example, runs Linux guests using KVM and recommends running its VMM inside a jailer in production. This adds a boundary, but not an absolute guarantee: shared directories, devices, host services, and the virtualization stack still create attack surface. Startup and resource costs depend on the implementation.
+
+These mechanisms can also be layered, with an OS process policy inside a container or VM and a restricted runtime inside that process.
+
+<Figure kind="layers" />
+
+Agent permission rules govern what the harness agrees to execute. Once a command is running, those rules alone do not provide an operating-system boundary around the process.
+
+## Scope: where is the boundary drawn?
+
+“The agent is sandboxed” can mean at least three things:
+
+- **The whole agent runs inside it:** the loop, tools, and generated code. A remote model API may still sit outside it.
+- **Selected tools run inside it:** for example, shell commands. File tools, browser tools, integrations, or hooks may have separate policies or run outside that boundary. Claude Code's [Bash sandbox documentation](https://code.claude.com/docs/en/sandboxing#what-runs-outside-the-sandbox) gives a concrete example of this distinction.
+- **Only generated code runs inside it:** the model's Python or JavaScript is isolated, while the agent loop and its other tools retain their own authority.
+
+In each setup, credentials may be available inside the sandbox or kept outside it; the scope alone does not tell you which.
+
+For a code-execution feature, isolating the generated code may cover what you need. An agent with other tools needs a closer look: a shell sandbox, for example, cannot enforce a file policy on a separate, unsandboxed file-reading tool.
+
+## What I would ask before choosing one
+
+I would start with a small inventory, not a product name:
+
+1. Which files can it read and write, including configuration and secrets?
+2. Which network destinations and actions are allowed, and how is that enforced?
+3. Does the agent receive real credentials? If so, what can they do and how long do they last?
+4. What is shared with the host: a process, kernel, filesystem, devices, or sockets?
+5. Which tools and parts of the agent are outside the boundary?
+6. If the boundary fails, what is on the other side?
+
+If an agent escapes a sandbox on your laptop, it may gain access to personal credentials and logged-in sessions. On a shared server, it may reach other workloads or credentials held by the host.
+
+Before choosing a sandbox, I want answers to these questions for the setup I will actually run. Knowing that it uses a container or a microVM helps, but I still need to check its file access, network policy, credentials, and any tools running outside it.
+
+## Further reading
+
+- [The Protection of Information in Computer Systems — Saltzer and Schroeder](https://www.cs.virginia.edu/~evans/cs551/saltzer/): least privilege and complete mediation are still good questions to ask.
+- [Linux kernel documentation: Landlock](https://docs.kernel.org/userspace-api/landlock.html) and [seccomp](https://docs.kernel.org/userspace-api/seccomp_filter.html).
+- [Docker's security documentation](https://docs.docker.com/engine/security/): namespaces, control groups, capabilities, and the daemon's attack surface.
+- [Firecracker's design](https://github.com/firecracker-microvm/firecracker/blob/main/docs/design.md): one concrete microVM architecture.

@@ -1,0 +1,33 @@
+<figure id="fig-nest">
+<figcaption><div class="ft">How the layers fit together</div>
+<div class="fd">One setup that combines them. Each layer covers a different failure: the runtime limits the generated code, the process sandbox limits the agent, and an outer VM or container adds another boundary. Containers still share their host kernel. Keys and logs stay outside all of them.</div></figcaption>
+<div class="svgw"><svg aria-label="Nested boxes: a microVM or container contains an OS process sandbox, which contains the agent with its permission rules and a language runtime running the generated script. Outside the microVM, a credential and egress proxy receives only allowed traffic, and logs and transcripts receive events." role="img" viewbox="0 0 680 360">
+<style>
+      #fig-nest .in2{fill:var(--paper);stroke:var(--ink);stroke-width:1.2}
+      #fig-nest .in3{fill:var(--sbx);stroke:var(--ink);stroke-width:1;stroke-dasharray:5 3}
+      #fig-nest .ar{fill:none;stroke:var(--ink);stroke-width:1.5}
+      #fig-nest .ah{fill:var(--ink)}
+      #fig-nest .al{font-size:11px;fill:var(--n4)}
+    </style>
+<defs><marker id="nestM" markerheight="7" markerwidth="7" orient="auto" refx="9" refy="5" viewbox="0 0 10 10"><path class="ah" d="M0 0L10 5L0 10Z"></path></marker></defs>
+<rect class="sbx" height="328" rx="10" width="440" x="16" y="16"></rect>
+<text class="lbl" x="32" y="38">MICROVM OR CONTAINER</text>
+<rect class="in2" height="276" rx="8" width="400" x="36" y="52"></rect>
+<text class="lbl" x="52" y="74">OS PROCESS SANDBOX · SEATBELT, LANDLOCK</text>
+<g class="node"><rect height="56" rx="8" width="356" x="58" y="90"></rect>
+<text class="nt" x="236" y="114">Agent and harness</text><text class="ns" x="236" y="131">permission rules, auto mode</text></g>
+<rect class="in3" height="142" rx="8" width="356" x="58" y="166"></rect>
+<text class="lbl" x="74" y="188">LANGUAGE RUNTIME · CODE MODE</text>
+<g class="node"><rect height="56" rx="8" width="240" x="116" y="212"></rect>
+<text class="nt" x="236" y="236">Generated script</text><text class="ns" x="236" y="253">runs only what the runtime offers</text></g>
+<path class="ar" d="M456 118 H508" marker-end="url(#nestM)"></path>
+<text class="al" text-anchor="middle" x="482" y="108">allowed</text>
+<g class="node"><rect height="64" rx="8" width="156" x="510" y="86"></rect>
+<text class="nt" x="588" y="112">Credential and</text><text class="nt" x="588" y="128">egress proxy</text><text class="ns" x="588" y="143">adds keys, filters traffic</text></g>
+<path class="ar" d="M456 268 H508" marker-end="url(#nestM)"></path>
+<text class="al" text-anchor="middle" x="482" y="258">events</text>
+<g class="node"><rect height="56" rx="8" width="156" x="510" y="240"></rect>
+<text class="nt" x="588" y="264">Logs and transcripts</text><text class="ns" x="588" y="281">out of the agent's reach</text></g>
+<text class="lbl" text-anchor="middle" x="588" y="72">OUTSIDE</text>
+</svg></div>
+</figure>

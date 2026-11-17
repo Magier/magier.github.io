@@ -1,0 +1,79 @@
+.sandbox-post {
+  --paper:var(--surface); --ink:var(--fg); --red:var(--accent);
+  --red-soft:color-mix(in srgb, var(--accent) 12%, var(--bg));
+  --n1:var(--surface); --n2:var(--line); --n3:var(--muted); --n4:var(--fg);
+  --sbx:var(--bg); --display:var(--font-text); --body:var(--font-text);
+/* figures */
+figure{margin:32px 0 0;background:var(--paper);border:1px solid var(--n2);border-radius:8px;padding:20px}
+figcaption .ft{font:500 20px/1.3 var(--display)}
+figcaption .fd{font-size:14px;line-height:1.5;color:var(--n3);margin-top:4px}
+.svgw{overflow-x:auto;margin-top:16px}
+.svgw svg{display:block;width:100%;min-width:560px;height:auto}
+.controls{display:flex;flex-wrap:wrap;gap:8px;margin-top:16px}
+button{font:600 13px var(--body);color:var(--ink);background:var(--bg);border:1px solid var(--n2);border-radius:999px;padding:7px 14px;cursor:pointer}
+button:hover{border-color:var(--n3)}
+button[aria-pressed="true"]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+button.go{background:var(--red);border-color:var(--red);color:var(--bg)}
+.out{font-size:15px;line-height:1.5;margin-top:14px;min-height:3em;color:var(--ink)}
+.out b{color:var(--red);font-weight:600}
+
+/* svg vocabulary */
+svg text{font-family:var(--body)}
+.node rect{fill:var(--paper);stroke:var(--n2);stroke-width:1;transition:stroke .3s,fill .3s}
+.node.passive rect{fill:var(--n1)}
+.node.claim rect{stroke-dasharray:4 3}
+.node.seen rect{stroke:var(--n3)}
+.node.active rect{stroke:var(--red);stroke-width:1.5;fill:var(--red-soft)}
+.nt{font:500 13px var(--display);fill:var(--ink);text-anchor:middle}
+.ns{font-size:11px;fill:var(--n3);text-anchor:middle}
+.node.active .ns{fill:var(--red)}
+.sbx{fill:var(--sbx);stroke:var(--ink);stroke-width:1.5}
+.zone{fill:none;stroke:var(--n3);stroke-width:1;stroke-dasharray:3 4}
+.lbl{font-size:11px;font-weight:600;letter-spacing:.06em;fill:var(--n3)}
+.lbl.r{fill:var(--red)}
+.wallgap{stroke:var(--n3);stroke-width:1.5;stroke-dasharray:5 5;transition:stroke .3s}
+.wallgap.seen,.wallgap.active{stroke:var(--red)}
+.line{fill:none;stroke:var(--n3);stroke-width:1}
+.ahp{fill:none;stroke:var(--red);stroke-width:1.5}
+.ahg{fill:none;stroke:var(--n3);stroke-width:1.2}
+.flow{fill:none;stroke:var(--red);stroke-width:1.5;stroke-dasharray:1;stroke-dashoffset:1;opacity:0;transition:stroke-dashoffset .7s ease,opacity .25s}
+.flow.seen{stroke-dashoffset:0;opacity:.35}
+.flow.active{stroke-dashoffset:0;opacity:1}
+.link{fill:none;stroke:var(--n3);stroke-width:1.5;stroke-dasharray:2 4;opacity:0;transition:opacity .3s}
+.link.seen,.link.active{opacity:1;stroke:var(--red)}
+.xm{fill:none;stroke:var(--red);stroke-width:2.2;stroke-linecap:round;opacity:0;transition:opacity .3s}
+.xm.on,.xm.seen,.xm.active{opacity:1}
+.chip rect{fill:var(--red)}
+.chip text{font:600 11px var(--mono);fill:var(--bg);text-anchor:middle}
+
+/* net spectrum */
+.nstop{cursor:pointer}
+.nstop circle{fill:var(--paper);stroke:var(--ink);stroke-width:2;transition:fill .2s,stroke .2s}
+.nstop.on circle{fill:var(--red);stroke:var(--red)}
+.nstop:focus-visible{outline:none}.nstop:focus-visible circle{stroke:var(--red);stroke-width:3}
+.nstop .nt{font-size:12px}
+.leak{stroke:var(--red);stroke-width:2;stroke-dasharray:6 5;fill:none}
+.node.ok rect{stroke:var(--red);stroke-width:1.5;fill:var(--red-soft)}
+.node.ok .ns{fill:var(--red);font-weight:600}
+.node.no rect{stroke-dasharray:4 3;fill:var(--n1)}
+.node.no .ns{font-weight:600}
+  figure {
+    width:100%;
+    margin:36px 0;
+    border:1px solid var(--line);
+    border-radius:10px;
+    padding:24px;
+    font-family:var(--font-text);
+    --body:var(--font-text);
+    --display:var(--body);
+  }
+  .svgw svg { min-width:720px; }
+  button { border-radius:6px; font-size:15px; font-weight:normal; }
+  button:disabled { opacity:.45; cursor:default; }
+  button:focus-visible, [tabindex]:focus-visible { outline:2px solid var(--accent); outline-offset:3px; }
+  figcaption .ft { font:600 18px/1.5 var(--body); }
+  figcaption .fd, .out, .sources { font-size:16px; }
+  th, .meta, .clabel { font-size:16px; letter-spacing:normal; text-transform:none; }
+  @media(max-width:520px) { figure { padding:16px; } }
+  @media(prefers-reduced-motion:reduce) { *, *::before, *::after { transition:none!important; animation:none!important; } }
+}
