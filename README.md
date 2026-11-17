@@ -34,7 +34,7 @@ Similarly, a page under `src/pages/` can create a public route without appearing
 
 The original full sandbox article remains in `.local-drafts/sandbox/`. Its incident analysis and employer-specific material must stay unpublished until explicitly approved after the employer's article has gone live; do not publish it automatically on a date.
 
-The published basics-only post is in `src/content/posts/hands-in-the-sandbox.mdx`. It covers filesystem, network, credentials, execution isolation, and scope, using shared figure components. It uses the normal metadata, listing, and draft filtering. Unlike the private original, this basics-only version is cleared by the author for publication once reviewed.
+The published basics-only post is in `src/content/posts/50-shades-of-isolation.mdx`. It covers filesystem, network, credentials, execution isolation, and scope, using shared figure components. It uses the normal metadata, listing, and draft filtering. Unlike the private original, this basics-only version is cleared by the author for publication once reviewed.
 
 Ignored drafts are **not backed up by Git**. Keep a separate private backup if they matter.
 
