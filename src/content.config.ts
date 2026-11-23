@@ -15,8 +15,14 @@ const posts = defineCollection({
   schema: z.object({
     title: z.string(),
     description: z.string().optional(),
+    cover: z.object({
+      dark: z.string(),
+      light: z.string().optional(),
+      alt: z.string(),
+    }).optional(),
     date: z.coerce.date(),
     draft: z.boolean().default(false),
+    tags: z.array(z.string().regex(/^[a-z0-9]+(?:-[a-z0-9]+)*(?:\/[a-z0-9]+(?:-[a-z0-9]+)*)*$/)).default([]),
     series: reference('series').optional(),
     seriesOrder: z.number().optional(),
   }),

@@ -1,0 +1,43 @@
+---
+import Base from '../../layouts/Base.astro';
+import { getPosts, formatDate } from '../../lib/posts';
+import { getTopics, matchesTopic, topicLabel } from '../../lib/topics';
+
+export async function getStaticPaths() {
+  const posts = await getPosts();
+  const topics = getTopics(posts);
+  return topics.map((topic) => ({
+    params: { topic: topic.path },
+    props: { topic, topics, posts: posts.filter((post) => matchesTopic(post, topic.path)) },
+  }));
+}
+
+const { topic, topics, posts } = Astro.props;
+const segments = topic.path.split('/');
+const parents = segments.slice(0, -1).map((_, index) => segments.slice(0, index + 1).join('/'));
+const children = topics.filter((child) => child.depth === topic.depth + 1 && child.path.startsWith(`${topic.path}/`));
+---
+<Base wide title={topic.label} description={`Posts about ${topic.label}.`}>
+  <article>
+    <nav aria-label="Topic parents">
+      <a href="/">All posts</a>
+      {parents.map((path) => <> / <a href={`/topics/${path}/`}>{topicLabel(path)}</a></>)}
+    </nav>
+    <h1>{topic.label}</h1>
+    {children.length > 0 && (
+      <nav aria-label="Subtopics">
+        <ul>
+          {children.map((child) => <li><a href={`/topics/${child.path}/`}>{child.label}</a> <span class="muted">({child.count})</span></li>)}
+        </ul>
+      </nav>
+    )}
+    <ul class="list">
+      {posts.map((post) => (
+        <li>
+          <time datetime={post.data.date.toISOString()}>{formatDate(post.data.date)}</time>
+          <a href={`/posts/${post.id}/`}>{post.data.title}</a>
+        </li>
+      ))}
+    </ul>
+  </article>
+</Base>

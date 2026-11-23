@@ -1,0 +1,40 @@
+---
+import type { CollectionEntry } from 'astro:content';
+import { formatDate } from '../lib/posts';
+import { topicLabel } from '../lib/topics';
+interface Props { post: CollectionEntry<'posts'>; featured?: boolean; }
+const { post, featured = false } = Astro.props;
+const cover = post.data.cover;
+const url = `/posts/${post.id}/`;
+---
+<article class:list={['post-card', { featured }]}>
+  {cover && <a href={url} class="cover" tabindex="-1" aria-hidden="true">
+    <img class:list={{ 'cover-dark': !!cover.light }} src={cover.dark} alt="" width="1200" height="600" loading={featured ? 'eager' : 'lazy'} />
+    {cover.light && <img class="cover-light" src={cover.light} alt="" width="1200" height="600" loading={featured ? 'eager' : 'lazy'} />}
+  </a>}
+  <div class="card-copy">
+    <div class="card-meta">{featured && <span>Latest entry</span>}<time datetime={post.data.date.toISOString()}>{formatDate(post.data.date)}</time></div>
+    <h2><a href={url}>{post.data.title}</a></h2>
+    {post.data.description && <p>{post.data.description}</p>}
+    {post.data.tags.length > 0 && <ul aria-label="Topics">{post.data.tags.map(tag => <li><a href={`/topics/${tag}/`}>{topicLabel(tag)}</a></li>)}</ul>}
+  </div>
+</article>
+<style>
+  .post-card { overflow:hidden; border:1px solid var(--line); border-radius:10px 12px 8px 11px; background:var(--bg); }
+  .cover { display:block; overflow:hidden; }
+  .cover img { display:block; width:100%; height:auto; aspect-ratio:2/1; object-fit:cover; }
+  .cover-light { display:none !important; }
+  :global(html[data-mode="light"]) .cover-dark { display:none; }
+  :global(html[data-mode="light"]) .cover-light { display:block !important; }
+  .card-copy { padding:20px; }
+  .card-meta { display:flex; flex-wrap:wrap; justify-content:space-between; gap:10px; font-size:13px; color:var(--muted); margin-bottom:12px; }
+  .card-meta span { color:var(--accent); }
+  h2 { font-size:21px; line-height:1.35; margin:0 0 10px; font-weight:500; }
+  h2 a { text-decoration:none; }
+  p { color:var(--muted); font-size:16px; line-height:1.6; margin:0 0 14px; }
+  ul { display:flex; flex-wrap:wrap; list-style:none; padding:0; margin:0; gap:8px 16px; font-size:13px; color:var(--accent); }
+  .featured .card-copy { padding:24px 28px 26px; }
+  .featured h2 { font-size:clamp(26px,3vw,34px); }
+  .featured p { font-size:18px; }
+  @media(max-width:600px) { .featured .card-copy { padding:20px; } }
+</style>

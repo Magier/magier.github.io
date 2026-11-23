@@ -59,8 +59,20 @@ Git history tracks published revisions. A CMS is optional; the current Markdown/
   draft: true             # optional, hidden from build
   series: ai-agent-security  # optional, filename of a series
   seriesOrder: 1          # optional, order within series
+  tags:                   # optional, hierarchical topic paths
+    - security/agentic-ai/sandboxing
   ```
 - Series: `src/content/series/<slug>.md` with `title`, `description`, and an intro as body.
+
+### Topics
+
+Use lowercase, hyphen-separated segments in `tags`, separated by `/` for hierarchy.
+For example, `security/agentic-ai/sandboxing` creates Security → Agentic AI → Sandboxing.
+Parents are inferred from post metadata; no separate topic registry is needed.
+Each topic has a page at `/topics/<path>/`. Parent pages include posts tagged with
+any descendant, matching complete path segments (`security` does not match `security-tools`).
+Multiple tags are allowed; each post is counted once per topic. Untagged posts remain in the normal listing.
+Draft topics follow the same visibility rules as draft posts.
 
 ## Visitor analytics (GoatCounter)
 

@@ -1,7 +1,7 @@
 ---
 import Appearance from '../components/Appearance.astro';
-interface Props { title?: string; description?: string; wide?: boolean; }
-const { title, wide = false, description = 'Independent notes on agentic AI security, Kubernetes, and the systems underneath. By Markus, also known as Magier.' } = Astro.props;
+interface Props { title?: string; description?: string; wide?: boolean; home?: boolean; }
+const { title, wide = false, home = false, description = 'A personal notebook on security, AI, systems thinking, cognition, and older ideas worth another look. By Markus Gierlinger, also known as Magier.' } = Astro.props;
 const goatCounterCode = import.meta.env.PUBLIC_GOATCOUNTER_CODE?.trim();
 const analyticsEnabled = import.meta.env.PROD && !!goatCounterCode;
 const fullTitle = title ? `${title} · Magier’s Musings` : 'Magier’s Musings';
@@ -20,25 +20,22 @@ const fullTitle = title ? `${title} · Magier’s Musings` : 'Magier’s Musings
     )}
     <script is:inline>
       try {
-        const p = localStorage.getItem('palette');
         const m = localStorage.getItem('mode');
-        if (['moss', 'ember', 'indigo', 'persimmon', 'purple'].includes(p)) document.documentElement.dataset.palette = p;
-        if (['ochre', 'gold'].includes(p)) localStorage.setItem('palette', 'indigo');
         if (['light', 'dark'].includes(m)) document.documentElement.dataset.mode = m;
       } catch {}
     </script>
   </head>
   <body>
     <a class="skip" href="#content">Skip to content</a>
-    <div class:list={["page", { "page-wide": wide }]}>
+    <div class:list={["page", { "page-wide": wide, "page-home": home }]}>
       <header class="masthead">
-        <a href="/" class="wordmark">Magier’s Musings</a>
-        <span class="byline">By Markus / <a href="https://github.com/Magier">Magier</a></span>
+        <div><a href="/" class="wordmark">Magier’s Musings</a>
+        {!home && <span class="byline">By Markus / <a href="https://github.com/Magier">Magier</a></span>}</div>
+        <Appearance />
       </header>
       <main id="content"><slot /></main>
       <footer>
         <p>Markus · <a href="https://github.com/Magier">GitHub ↗</a><br /><span class="muted">Personal notes. Views are my own. · <a href="/privacy/">Privacy</a></span></p>
-        <Appearance />
       </footer>
     </div>
   </body>
@@ -78,7 +75,11 @@ const fullTitle = title ? `${title} · Magier’s Musings` : 'Magier’s Musings
   :focus-visible { outline:2px solid var(--accent); outline-offset:5px; }
   .skip { position:absolute; left:1rem; top:-5rem; background:var(--bg); padding:.5rem; z-index:10; }
   .skip:focus { top:1rem; }
-  .masthead { padding:56px 0 28px; border-bottom:1px solid var(--line); }
+  .masthead { display:flex; justify-content:space-between; align-items:center; gap:24px; padding:40px 0 28px; border-bottom:1px solid var(--line); }
+  body:has(.page-home) { isolation:isolate; }
+  .page-home { width:min(100% - 3rem, 1320px); }
+  .page-home .masthead { padding:32px 0; border-bottom:1px solid var(--line); }
+  .page-home .wordmark { font-size:clamp(36px,6vw,54px); letter-spacing:-.035em; }
   .wordmark { font-size:clamp(32px, 6vw, 44px); line-height:1.2; font-weight:600; text-decoration:none; }
   .byline { display:block; color:var(--muted); margin-top:6px; }
   h1,h2,h3 { font-size:20px; font-weight:600; line-height:1.5; letter-spacing:normal; }

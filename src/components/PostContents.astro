@@ -1,0 +1,22 @@
+---
+import type { MarkdownHeading } from 'astro';
+interface Props { headings: MarkdownHeading[]; }
+const { headings } = Astro.props;
+---
+<nav aria-label="Table of contents">
+  <ul>
+    {headings.map((heading) => (
+      <li class:list={[{ subsection: heading.depth === 3 }]}>
+        <a href={`#${heading.slug}`}>{heading.text}</a>
+      </li>
+    ))}
+  </ul>
+</nav>
+
+<style>
+  ul { list-style:none; margin:0; padding:0; }
+  li { margin:0; }
+  a { display:block; padding:.3rem 0; color:var(--muted); text-decoration:none; overflow-wrap:anywhere; }
+  a:hover, a:focus-visible { color:var(--accent); text-decoration:underline; }
+  .subsection { padding-left:1rem; }
+</style>

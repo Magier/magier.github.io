@@ -3,6 +3,12 @@ title: "50 Shades of Isolation"
 description: "What ‘sandboxed’ actually means for AI agents"
 date: 2026-11-16
 draft: false
+cover:
+  dark: /images/hands-in-the-sandbox/robot-garden-dark.png
+  light: /images/hands-in-the-sandbox/robot-garden-light.png
+  alt: "An ink-wash robot in a garden, enclosed by different kinds of boundaries."
+tags:
+  - security/agentic-ai/sandboxing
 ---
 
 import Figure from '../../components/sandbox/Figure.astro';
@@ -44,6 +50,8 @@ A starting policy might allow reads and writes in one project directory, read an
 
 Reading a secret exposes it to the agent, while writing a startup script, tool configuration, or [Git hook](https://git-scm.com/docs/githooks) can affect a process that runs later, possibly outside the sandbox. Git executes enabled hooks at specific points in its workflow, so the risk depends on whether a later Git invocation uses the modified hook. When setting file permissions, I would check what the agent can read and which processes will later act on what it writes.
 
+OpenAI gives a concrete example in [its description of the Codex sandbox](https://openai.com/index/inside-the-codex-sandbox/): an agent could modify a local copy of `node_modules/prettier`, which the user's editor might later run on save, outside the sandbox. Because `node_modules` is commonly ignored by Git, that modification might not appear in `git status`. The write can be allowed by the sandbox even though the later execution has access the agent did not.
+
 ### 2. Network
 
 Network access is a path for data to leave and for actions to affect other systems. It is not just an on/off switch.
@@ -53,6 +61,10 @@ Network access is a path for data to leave and for actions to affect other syste
 No network is a useful default for tasks that do not need it. Package-only access can support builds, while an allowlist can permit the services a task actually needs. A denylist leaves everything else open, including destinations you did not think to block.
 
 An allowed service may still accept uploads, public posts, or requests to attacker-controlled accounts, so an allowlist alone will not prevent data leaks. For example, permission to reach GitHub could let an agent upload private files to someone else's repository when all it needed was to fetch a dependency, if it also has the necessary repository permissions. GitHub's [file-contents API](https://docs.github.com/en/rest/repos/contents#create-or-update-file-contents) supports writes as well as reads; a hostname allowlist does not distinguish them. DNS, redirects, direct IP connections, and other routes also need enforcement consistent with the policy. OWASP's [SSRF prevention guidance](https://cheatsheetseries.owasp.org/cheatsheets/Server_Side_Request_Forgery_Prevention_Cheat_Sheet.html) describes how redirects and DNS resolution can undermine destination checks. Its focus is server-side requests, but those bypasses also matter when a sandbox relies on a filtering proxy.
+
+If network access goes through a proxy, setting `HTTPS_PROXY` does not force a program to use it. The sandbox also needs to block direct connections that would bypass the proxy. [Codex combines proxy configuration with OS-enforced connection restrictions](https://openai.com/index/inside-the-codex-sandbox/) for this reason.
+
+Local services need attention too. A process that cannot reach the internet may still be able to talk to a database on localhost or a container engine through a Unix socket, depending on what the sandbox exposes. OpenAI's implementation illustrates the platform differences: its Linux sandbox uses a separate network namespace, including its own loopback interface, while the Windows MXC setup described in the article allows host-loopback connections and leaves other local services reachable. I would check access to local services separately from external destinations.
 
 An internal package registry can help control dependencies, but it still needs maintenance and its own access policy.
 
@@ -99,6 +111,12 @@ In each setup, credentials may be available inside the sandbox or kept outside i
 
 For a code-execution feature, isolating the generated code may cover what you need. An agent with other tools needs a closer look: a shell sandbox, for example, cannot enforce a file policy on a separate, unsandboxed file-reading tool.
 
+### Exceptions: when can the boundary change?
+
+The scope may change during a task if a command needs access the default policy denies. In Codex's section on [how the harness uses the sandbox](https://openai.com/index/inside-the-codex-sandbox/#:~:text=How%20the%20harness%20leverages%20the%20sandbox), a command can request additional permissions inside the sandbox or request execution outside it. The harness decides whether to authorize that request under the user's settings, which may involve a prompt or an automated review.
+
+For me, those are different decisions. Granting access to one additional directory leaves the other restrictions in place; running outside the sandbox removes that sandbox's restrictions for the command, though other host controls may still apply. I would want to know who can authorize either change, whether it applies to one command or persists for later work, and whether the decision is recorded. In a managed environment, I would also want administrators to be able to set limits that a local approval cannot override.
+
 ## What I would ask before choosing one
 
 I would start with a small inventory, not a product name:
@@ -108,13 +126,16 @@ I would start with a small inventory, not a product name:
 3. Does the agent receive real credentials? If so, what can they do and how long do they last?
 4. What is shared with the host: a process, kernel, filesystem, devices, or sockets?
 5. Which tools and parts of the agent are outside the boundary?
-6. If the boundary fails, what is on the other side?
+6. Can a command run outside the sandbox, and who authorizes that exception?
+7. If the boundary fails, what is on the other side?
 
 If an agent escapes a sandbox on your laptop, it may gain access to personal credentials and logged-in sessions. On a shared server, it may reach other workloads or credentials held by the host.
 
 Before choosing a sandbox, I want answers to these questions for the setup I will actually run. Knowing that it uses a container or a microVM helps, but I still need to check its file access, network policy, credentials, and any tools running outside it.
 
 ## Further reading
+
+- [Inside the Codex sandbox, OpenAI](https://openai.com/index/inside-the-codex-sandbox/): a concrete implementation of filesystem and network policies, platform-specific enforcement, and permission exceptions.
 
 - [The Protection of Information in Computer Systems — Saltzer and Schroeder](https://www.cs.virginia.edu/~evans/cs551/saltzer/): least privilege and complete mediation are still good questions to ask.
 - [Linux kernel documentation: Landlock](https://docs.kernel.org/userspace-api/landlock.html) and [seccomp](https://docs.kernel.org/userspace-api/seccomp_filter.html).
