@@ -34,7 +34,7 @@ const series = post.data.series ? await getEntry(post.data.series) : undefined;
     {post.data.description && <p class="post-subtitle muted">{post.data.description}</p>}
     <p class="muted">
       <time>{formatDate(post.data.date)}</time>
-      {series && <> · part of <a href={`/series/${series.id}/`}>{series.data.title}</a></>}
+      {series && <> part of <a href={`/series/${series.id}/`}>{series.data.title}</a></>}
     </p>
     {post.data.tags.length > 0 && (
       <nav class="post-topics" aria-label="Post topics">

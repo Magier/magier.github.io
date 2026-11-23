@@ -4,7 +4,7 @@ interface Props { title?: string; description?: string; wide?: boolean; home?: b
 const { title, wide = false, home = false, description = 'A personal notebook on security, AI, systems thinking, cognition, and older ideas worth another look. By Markus Gierlinger, also known as Magier.' } = Astro.props;
 const goatCounterCode = import.meta.env.PUBLIC_GOATCOUNTER_CODE?.trim();
 const analyticsEnabled = import.meta.env.PROD && !!goatCounterCode;
-const fullTitle = title ? `${title} · Magier’s Musings` : 'Magier’s Musings';
+const fullTitle = title ? `${title} | Magier’s Musings` : 'Magier’s Musings';
 ---
 <!doctype html>
 <html lang="en" data-palette="indigo" data-mode="dark">
@@ -35,7 +35,8 @@ const fullTitle = title ? `${title} · Magier’s Musings` : 'Magier’s Musings
       </header>
       <main id="content"><slot /></main>
       <footer>
-        <p>Markus · <a href="https://github.com/Magier">GitHub ↗</a><br /><span class="muted">Personal notes. Views are my own. · <a href="/privacy/">Privacy</a></span></p>
+        <p class="muted">Personal notes. Views are my own.</p>
+        <a href="/privacy/">Privacy</a>
       </footer>
     </div>
   </body>
@@ -67,7 +68,8 @@ const fullTitle = title ? `${title} · Magier’s Musings` : 'Magier’s Musings
   :root[data-mode="light"][data-palette="purple"] { --bg:#f3f0f6; --surface:#e8e1ef; --fg:#2b2632; --accent:#600fed; --secondary:#526b5b; --muted:#6b6275; --line:#cfc5d9; }
   * { box-sizing:border-box; }
   body { margin:0; background:var(--bg); color:var(--fg); font: 18px/1.7 var(--font-text); }
-  .page { width:min(100% - 3rem, 720px); margin:0 auto; }
+  .page { width:min(100% - 3rem, 720px); margin:0 auto; min-height:100svh; display:flex; flex-direction:column; }
+  main { flex:1; padding-bottom:64px; }
   .page-wide { width:min(100% - 3rem, 960px); }
   .page-wide main > article { max-width:none; }
   a { color:inherit; text-underline-offset:.23em; text-decoration-thickness:1px; }
@@ -86,12 +88,12 @@ const fullTitle = title ? `${title} · Magier’s Musings` : 'Magier’s Musings
   .section-label { font:inherit; color:var(--muted); }
   p { margin:0 0 1.2rem; }
   .muted { color:var(--muted); }
-  footer { margin-top:80px; padding:25px 0 38px; border-top:1px solid var(--line); display:flex; flex-direction:column; gap:24px; align-items:flex-start; }
+  footer { padding:25px 0 38px; border-top:1px solid var(--line); display:flex; flex-wrap:wrap; gap:12px 24px; align-items:baseline; justify-content:space-between; font-size:16px; }
   footer p { font-size:16px; line-height:1.7; }
   main > article { max-width:680px; margin:50px auto; }
   pre { padding:1rem; background:var(--surface); overflow-x:auto; }
   img,svg { max-width:100%; }
   ul.list { padding:0; list-style:none; }
   ul.list time { color:var(--muted); margin-right:1rem; }
-  @media(max-width:600px) { .masthead { padding-top:36px; } footer { flex-direction:column; margin-top:52px; } }
+  @media(max-width:600px) { .masthead { padding-top:36px; } footer { flex-direction:column; } }
 </style>

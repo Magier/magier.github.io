@@ -3,12 +3,15 @@ import { getCollection } from 'astro:content';
 import Base from '../layouts/Base.astro';
 import HomeLandscape from '../components/HomeLandscape.astro';
 import PostCard from '../components/PostCard.astro';
+import TopicBadges from '../components/TopicBadges.astro';
+import { projects } from '../lib/projects';
 import { getPosts } from '../lib/posts';
 import { getTopics } from '../lib/topics';
 const posts = await getPosts();
 const [latest, ...older] = posts;
 const series = await getCollection('series');
-const topics = getTopics(posts);
+const topics = getTopics([...posts, ...projects]);
+const ran = projects[0];
 ---
 <Base wide home>
   <HomeLandscape />
@@ -27,8 +30,9 @@ const topics = getTopics(posts);
       {series.length > 0 && <section class="series"><h2>Series</h2><ul>{series.map(s => <li><a href={`/series/${s.id}/`}>{s.data.title}</a><p>{s.data.description}</p></li>)}</ul></section>}
       <aside class="project" aria-labelledby="project-title">
         <p class="margin-note">Elsewhere on my desk</p>
-        <h2 id="project-title"><a href="https://github.com/Magier/Ran">Ran <span aria-hidden="true">↗</span></a></h2>
-        <p>My open-source project for adversary emulation in Kubernetes. Exploring a system by asking what an attacker could do with it.</p>
+        <h2 id="project-title"><a href={ran.url}>{ran.title} <span aria-hidden="true">↗</span></a></h2>
+        <p>{ran.description}</p>
+        <TopicBadges tags={ran.data.tags} />
       </aside>
     </div>
 
@@ -38,12 +42,14 @@ const topics = getTopics(posts);
           <h2 id="about-title">Markus / Magier</h2>
           <p>I’m Markus Gierlinger. I currently research agentic AI security, with a background in Kubernetes security, symbolic AI, and software engineering.</p>
           <p>Here I follow my curiosity a little further: systems thinking, cybernetics, cognition, human biases, and older ideas worth another look.</p>
-          <nav class="profile-links" aria-label="Find Markus elsewhere"><a href="https://github.com/Magier">GitHub ↗</a><a href="https://www.linkedin.com/in/markus-gierlinger/">LinkedIn ↗</a></nav>
+          <nav class="profile-links" aria-label="Find Markus elsewhere">
+            <a href="https://github.com/Magier" aria-label="Markus on GitHub" title="GitHub"><svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 .75a11.25 11.25 0 0 0-3.56 21.92c.56.1.77-.24.77-.54v-2.1c-3.13.68-3.79-1.33-3.79-1.33-.51-1.3-1.25-1.65-1.25-1.65-1.02-.7.08-.69.08-.69 1.13.08 1.72 1.16 1.72 1.16 1 1.72 2.63 1.22 3.27.93.1-.73.39-1.22.71-1.5-2.5-.29-5.13-1.25-5.13-5.56 0-1.23.44-2.23 1.16-3.02-.12-.29-.5-1.43.11-2.98 0 0 .95-.3 3.1 1.15a10.8 10.8 0 0 1 5.63 0c2.15-1.45 3.09-1.15 3.09-1.15.62 1.55.23 2.69.12 2.98.72.79 1.15 1.79 1.15 3.02 0 4.32-2.63 5.27-5.14 5.55.4.35.76 1.03.76 2.08v3.11c0 .3.2.65.78.54A11.25 11.25 0 0 0 12 .75Z"/></svg></a>
+            <a href="https://www.linkedin.com/in/markus-gierlinger/" aria-label="Markus on LinkedIn" title="LinkedIn"><svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M20.45 2H3.55C2.69 2 2 2.68 2 3.52v16.96c0 .84.69 1.52 1.55 1.52h16.9c.86 0 1.55-.68 1.55-1.52V3.52c0-.84-.69-1.52-1.55-1.52ZM7.93 18.75H4.98V9.2h2.95v9.55ZM6.45 7.9a1.71 1.71 0 1 1 0-3.42 1.71 1.71 0 0 1 0 3.42Zm12.3 10.85H15.8V14.1c0-1.11-.02-2.54-1.55-2.54-1.55 0-1.79 1.21-1.79 2.46v4.73H9.51V9.2h2.83v1.3h.04c.39-.74 1.36-1.52 2.79-1.52 2.98 0 3.53 1.96 3.53 4.51v5.26Z"/></svg></a>
+          </nav>
         </section>
         {topics.length > 0 && <nav class="topics" aria-labelledby="topics-title">
           <h2 id="topics-title">Follow a thread</h2>
           <ul>{topics.map(topic => <li style={`--depth:${topic.depth}`}><a href={`/topics/${topic.path}/`}>{topic.label}<span class="topic-count">{topic.count}</span></a></li>)}</ul>
-          <p>Each topic includes the branches beneath it.</p>
         </nav>}
       </div>
     </aside>
@@ -61,7 +67,9 @@ const topics = getTopics(posts);
   .sidebar-sticky { position:sticky; top:32px; }
   .about h2 { color:var(--fg); font-size:18px; margin-bottom:18px; }
   .about p { font-size:15px; line-height:1.75; color:var(--muted); }
-  .profile-links { display:flex; flex-wrap:wrap; gap:20px; font-size:14px; }
+  .profile-links { display:flex; flex-wrap:wrap; gap:8px; }
+  .profile-links a { display:grid; place-items:center; width:44px; height:44px; color:var(--muted); }
+  .profile-links a:hover { color:var(--accent); }
   .topics { margin-top:30px; padding-top:24px; border-top:1px solid var(--line); }
   .topics h2 { color:var(--muted); font-size:16px; }
   .topics ul { list-style:none; margin:18px 0 14px; padding:0; }
