@@ -30,7 +30,7 @@ const fullTitle = title ? `${title} | Magier’s Musings` : 'Magier’s Musings'
     <div class:list={["page", { "page-wide": wide, "page-home": home }]}>
       <header class="masthead">
         <div><a href="/" class="wordmark">Magier’s Musings</a>
-        {!home && <span class="byline">By Markus / <a href="https://github.com/Magier">Magier</a></span>}</div>
+        </div>
         <Appearance />
       </header>
       <main id="content"><slot /></main>
@@ -83,7 +83,6 @@ const fullTitle = title ? `${title} | Magier’s Musings` : 'Magier’s Musings'
   .page-home .masthead { padding:32px 0; border-bottom:1px solid var(--line); }
   .page-home .wordmark { font-size:clamp(36px,6vw,54px); letter-spacing:-.035em; }
   .wordmark { font-size:clamp(32px, 6vw, 44px); line-height:1.2; font-weight:600; text-decoration:none; }
-  .byline { display:block; color:var(--muted); margin-top:6px; }
   h1,h2,h3 { font-size:20px; font-weight:600; line-height:1.5; letter-spacing:normal; }
   .section-label { font:inherit; color:var(--muted); }
   p { margin:0 0 1.2rem; }

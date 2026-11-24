@@ -16,7 +16,7 @@ import Artwork from '../../components/sandbox/Artwork.astro';
 
 <Artwork />
 
-Sandboxing comes up a lot in discussions about securing AI agents, but I'm often left wondering what exactly is being isolated. One setup runs commands in a microVM; another applies an operating-system policy to a process. Sometimes the restriction is just on outgoing network traffic. All of these get called sandboxes, even though they place very different limits on what an agent can do.
+Sandboxing comes up a lot in discussions about securing AI agents, but I'm often left wondering what exactly is being isolated. One setup runs the entire agent in a microVM, another applies an operating-system policy to a process, and sometimes the restriction is just on outgoing network traffic. All of these get called sandboxes, even though they place very different limits on what an agent can do.
 
 To make sense of those differences, I find it useful to look at 4 aspects:
 - filesystem access
@@ -135,8 +135,8 @@ Before choosing a sandbox, I want answers to these questions for the setup I wil
 
 ## Further reading
 
+- <svg style="display:inline-block;vertical-align:-1px;margin-right:6px;color:var(--accent)" role="img" aria-label="YouTube video" width="20" height="14" viewBox="0 0 20 14" fill="currentColor"><path d="M19.6 2.2A2.5 2.5 0 0 0 17.8.4C16.2 0 10 0 10 0S3.8 0 2.2.4A2.5 2.5 0 0 0 .4 2.2C0 3.8 0 7 0 7s0 3.2.4 4.8a2.5 2.5 0 0 0 1.8 1.8C3.8 14 10 14 10 14s6.2 0 7.8-.4a2.5 2.5 0 0 0 1.8-1.8C20 10.2 20 7 20 7s0-3.2-.4-4.8ZM8 10V4l5.2 3L8 10Z"/></svg> [Pwning and Defending AI Agent Code Interpreters, Kinnaird McQuade (BSidesSF 2026)](https://www.youtube.com/watch?v=Fdrm2tLVAwc): a talk that also walks through different kinds of isolation.
 - [Inside the Codex sandbox, OpenAI](https://openai.com/index/inside-the-codex-sandbox/): a concrete implementation of filesystem and network policies, platform-specific enforcement, and permission exceptions.
-
 - [The Protection of Information in Computer Systems — Saltzer and Schroeder](https://www.cs.virginia.edu/~evans/cs551/saltzer/): least privilege and complete mediation are still good questions to ask.
 - [Linux kernel documentation: Landlock](https://docs.kernel.org/userspace-api/landlock.html) and [seccomp](https://docs.kernel.org/userspace-api/seccomp_filter.html).
 - [Docker's security documentation](https://docs.docker.com/engine/security/): namespaces, control groups, capabilities, and the daemon's attack surface.
